@@ -1,0 +1,8 @@
+cooldown: 300 # Cooldown time (in ticks) for enderpearls.  Recommended: 300
+cancel-launch-suffocating: true # Cancel launch if the player is suffocating. Recommended: true
+cancel-land-inside: true # Cancel pearls that land inside blocks. Recommended: true
+
+messages:
+  cancel-launch-cooldown: "&cYou cannot pearl for another &b{TIME}&r&c seconds." # Options: {TIME} - Seconds until cooldown ends.
+  cancel-launch-suffocating: "&cYou cannot pearl while suffocating."
+  cancel-land-inside: "&cYou cannot pearl inside of a block."
