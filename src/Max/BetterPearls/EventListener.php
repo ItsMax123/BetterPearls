@@ -20,9 +20,12 @@ use pocketmine\world\Position;
 use pocketmine\world\World;
 
 final class EventListener implements Listener {
-    public array $lastPearlLand = [];
+    private BetterPearls $plugin;
+    private array $lastPearlLand = [];
 
-    public function __construct(private readonly BetterPearls $plugin) {}
+    public function __construct(BetterPearls $plugin) {
+        $this->plugin = $plugin;
+    }
 
     /**
      * @priority HIGHEST

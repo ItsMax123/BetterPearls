@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Max\BetterPearls;
 
-use pocketmine\plugin\PluginBase;
 use pocketmine\player\Player;
+use pocketmine\plugin\PluginBase;
 
 class BetterPearls extends PluginBase {
     private static BetterPearls $instance;
