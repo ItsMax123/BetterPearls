@@ -16,4 +16,4 @@ messages:
 
   cancel-launch-suffocating: "&cYou cannot pearl while suffocating."
 
-  cancel-land-inside: "&cYou cannot pearl inside of a block."
+  cancel-land-inside-block: "&cYou cannot pearl inside a block."

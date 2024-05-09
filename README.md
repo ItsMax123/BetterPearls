@@ -3,4 +3,8 @@
 [![](https://poggit.pmmp.io/shield.dl.total/BetterPearls)](https://poggit.pmmp.io/p/BetterPearls)
 
 # BetterPearls
-BetterPearls is an open source [PocketMine-MP](https://pmmp.io/) plugin that implements pearl cooldown and prevents pearl glitching.
+BetterPearls is an open source [PocketMine-MP](https://pmmp.io/) plugin aimed at improving vanilla Ender Pearls.
+
+## Features
+- Configurable Cooldown for ender pearls.
+- Anti-glitching mechanics to prevent players from using ender pearls to glitch through blocks.

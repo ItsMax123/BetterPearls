@@ -106,9 +106,9 @@ final class EventListener implements Listener {
         //  Stop here and possibly cancel the event.
         if ($this->isInCollisionBox($world, $x, $y, $z)) {
             $config = $this->plugin->getConfig();
-            if ($config->get("cancel-land-inside")) {
+            if ($config->get("cancel-land-inside-block")) {
                 $event->cancel();
-                $player->sendMessage(TextFormat::colorize($config->getNested("messages.cancel-land-inside")));
+                $player->sendMessage(TextFormat::colorize($config->getNested("messages.cancel-land-inside-block")));
             }
             return;
         }
