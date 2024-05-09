@@ -32,9 +32,9 @@ final class EventListener implements Listener {
         $player = $event->getPlayer();
         $position = $player->getPosition();
         $config = $this->plugin->getConfig();
-        if ($config->get("cancel-launch-suffocating") && $this->isInCollisionBox($position->getWorld(), $position->x, $position->y + $player->getEyeHeight(), $position->z)) {
+        if ($config->get("cancel-launch-suffocating", true) && $this->isInCollisionBox($position->getWorld(), $position->x, $position->y + $player->getEyeHeight(), $position->z)) {
             $event->cancel();
-            $player->sendMessage(TextFormat::colorize($config->getNested("messages.cancel-launch-suffocating")));
+            $player->sendMessage(TextFormat::colorize($config->getNested("messages.cancel-launch-suffocating", "cancel-launch-suffocating")));
             return;
         }
         $session = $this->plugin->getSession($player);
@@ -43,7 +43,7 @@ final class EventListener implements Listener {
             $player->sendMessage(str_replace(
                 ["{TIME}"],
                 [(int)($session->getPearlCooldownExpiry() / 20)],
-                TextFormat::colorize($config->getNested("messages.cancel-launch-cooldown"))
+                TextFormat::colorize($config->getNested("messages.cancel-launch-cooldown", "cancel-launch-cooldown"))
             ));
         } else {
             $session->startPearlCooldown();
@@ -69,6 +69,7 @@ final class EventListener implements Listener {
         $x = $to->getX();
         $y = $to->getY();
         $z = $to->getZ();
+        $config = $this->plugin->getConfig();
 
         // This whole section of code does not look very clean can probably be optimized.
         // However, everything here does have a purpose.
@@ -102,22 +103,26 @@ final class EventListener implements Listener {
             $z = $newZ;
         }
 
+        // Honestly I've never had this happen in practice, but there's probably a way.
         // If the previous step failed to find a position that is not inside a collision box:
         //  Stop here and possibly cancel the event.
         if ($this->isInCollisionBox($world, $x, $y, $z)) {
-            $config = $this->plugin->getConfig();
-            if ($config->get("cancel-land-inside-block")) {
+            if ($config->get("cancel-landing-inside-block", true)) {
                 $event->cancel();
-                $player->sendMessage(TextFormat::colorize($config->getNested("messages.cancel-land-inside-block")));
+                $player->sendMessage(TextFormat::colorize($config->getNested("messages.cancel-landing-inside-block", "cancel-landing-inside-block")));
             }
             return;
         }
 
-        // Get the nearest collision boxes within 1m in each of the XY directions.
+        // Get the nearest collision boxes within 1m in each of the XY directions to try to set a better position.
+        // If there is less than 0.6m of available space:
+        //  Possibly cancel event depending on config.
+        // If there is between 0.6m and 1m of space:
+        //  Set the new position to be in the middle of this available space.
+        // If the is more than 1m of space but one of the collision boxes is less than 0.5m away:
+        //  Set the position to be 0.5m away from that wall.
         $maxX = $x;
-        $maxZ = $z;
         $minX = $x;
-        $minZ = $z;
         for ($n = 0; $n < 20; $n++) {
             $maxX += 0.05;
             $box = $this->isInCollisionBox($world, $maxX, $y, $z);
@@ -134,6 +139,22 @@ final class EventListener implements Listener {
                 break;
             }
         }
+        if ($maxX - $minX >= 0.6) {
+            if ($maxX - $minX <= 1) {
+                $x = ($maxX + $minX) / 2;
+            } elseif ($maxX - $x < 0.5) {
+                $x = $maxX - 0.5;
+            } elseif ($x - $minX < 0.5) {
+                $x = $minX + 0.5;
+            }
+        } elseif ($config->get("cancel-landing-small-area")) {
+            $event->cancel();
+            $player->sendMessage(TextFormat::colorize($config->getNested("messages.cancel-landing-small-area", "cancel-landing-small-area")));
+            return;
+        }
+
+        $maxZ = $z;
+        $minZ = $z;
         for ($n = 0; $n < 20; $n++) {
             $maxZ += 0.05;
             $box = $this->isInCollisionBox($world, $x, $y, $maxZ);
@@ -150,21 +171,6 @@ final class EventListener implements Listener {
                 break;
             }
         }
-
-        // Using the information about nearest collision boxes, try to set a better position.
-        // If there is between 0.6m and 1m of space:
-        //  Set the new position to be in the middle of this available space.
-        // If the is more than 1m of space but one of the collision boxes is less than 0.5m away:
-        //  Set the position to be 0.5m away from that wall.
-        if ($maxX - $minX >= 0.6) {
-            if ($maxX - $minX <= 1) {
-                $x = ($maxX + $minX) / 2;
-            } elseif ($maxX - $x < 0.5) {
-                $x = $maxX - 0.5;
-            } elseif ($x - $minX < 0.5) {
-                $x = $minX + 0.5;
-            }
-        }
         if ($maxZ - $minZ >= 0.6) {
             if ($maxZ - $minZ <= 1) {
                 $z = ($maxZ + $minZ) / 2;
@@ -173,6 +179,10 @@ final class EventListener implements Listener {
             } elseif ($z - $minZ < 0.5) {
                 $z = $minZ + 0.5;
             }
+        } elseif ($config->get("cancel-landing-small-area")) {
+            $event->cancel();
+            $player->sendMessage(TextFormat::colorize($config->getNested("messages.cancel-landing-small-area", "cancel-landing-small-area")));
+            return;
         }
 
         // Bring the Y coord down 1.75 blocks or until it runs into a collision box.
@@ -183,6 +193,12 @@ final class EventListener implements Listener {
                 $y = $box->maxY;
                 break;
             }
+        }
+
+        if ($config->get("cancel-landing-suffocating") && $this->isInCollisionBox($world, $x, $y + $player->getEyeHeight(), $z)) {
+            $event->cancel();
+            $player->sendMessage(TextFormat::colorize($config->getNested("messages.cancel-landing-suffocating", "cancel-landing-suffocating")));
+            return;
         }
 
         // Set new teleport position
@@ -212,7 +228,7 @@ final class EventListener implements Listener {
             if (!$player instanceof Player) return;
             if (!isset($this->lastPearlLand[$player->getUniqueId()->getBytes()]) || $this->lastPearlLand[$player->getUniqueId()->getBytes()] !== Server::getInstance()->getTick()) return;
             $this->plugin->getSession($player)->stopPearlCooldown();
-            if ($this->plugin->getConfig()->get("refund-canceled")) {
+            if ($this->plugin->getConfig()->get("refund-canceled", true)) {
                 $player->getInventory()->addItem(VanillaItems::ENDER_PEARL());
             }
         }

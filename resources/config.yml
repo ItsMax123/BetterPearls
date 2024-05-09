@@ -8,7 +8,13 @@ refund-canceled: true
 cancel-launch-suffocating: true
 
 # Cancel pearls that land inside blocks. Recommended: true
-cancel-land-inside-block: true
+cancel-landing-inside-block: true
+
+# Cancel pearls that land in areas smaller than 0.6 blocks wide. Recommemded: false
+cancel-landing-small-area: false
+
+# Cancel pearls that land in areas where the player would be suffocating. Recommemded: false
+cancel-landing-suffocating: false
 
 messages:
   # Options: {TIME} - Seconds until cooldown ends.
@@ -16,4 +22,8 @@ messages:
 
   cancel-launch-suffocating: "&cYou cannot pearl while suffocating."
 
-  cancel-land-inside-block: "&cYou cannot pearl inside a block."
+  cancel-landing-inside-block: "&cYou cannot pearl inside a block."
+
+  cancel-landing-small-area: "&cYou cannot pearl in areas smaller than 0.6 blocks wide."
+
+  cancel-landing-suffocating: "&cYou cannot pearl in areas smaller than 1.8 blocks tall."
