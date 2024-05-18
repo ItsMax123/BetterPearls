@@ -2,6 +2,7 @@ name: BetterPearls
 main: Max\BetterPearls\BetterPearls
 version: 1.2.0
 api: 5.0.0
+softdepend: [ScoreHud]
 
 author: ItsMax123
 website: "https://github.com/ItsMax123/BetterPearls"
