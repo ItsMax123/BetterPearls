@@ -1,4 +1,4 @@
-# Cooldown time (in ticks) for enderpearls.  Recommended: 300
+# Cooldown time (in ticks) for enderpearls. Recommended: 300
 cooldown: 300
 
 # Refund enderpearl if the teleport is canceled by any plugin. Recommended: true
@@ -17,8 +17,11 @@ cancel-landing-small-area: false
 cancel-landing-suffocating: false
 
 messages:
-  # Options: {TIME} - Seconds until cooldown ends.
-  cancel-launch-cooldown: "&cYou cannot pearl for another &b{TIME}&r&c seconds."
+  cooldown-start: "&eYou are now in pearl cooldown for &b15&r&e seconds."
+
+  cooldown-stop: "&aYou are no longer in pearl cooldown."
+
+  cancel-launch-cooldown: "&cYou cannot pearl for another &b{TIME}&r&c seconds."  # Options: {TIME} - Seconds until cooldown ends.
 
   cancel-launch-suffocating: "&cYou cannot pearl while suffocating."
 

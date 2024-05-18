@@ -1,29 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Max\BetterPearls;
 
 use pocketmine\Server;
 
 class Session {
-    private int $lastPearlLaunch;
+    private int $endPearlCooldown;
+    private int $lastPearlLand;
 
     public function __construct() {
         $this->stopPearlCooldown();
     }
 
-    public function startPearlCooldown(): void {
-        $this->lastPearlLaunch = Server::getInstance()->getTick();
+    public function startPearlCooldown(int $cooldown): void {
+        $this->endPearlCooldown = Server::getInstance()->getTick() + $cooldown;
     }
 
     public function stopPearlCooldown(): void {
-        $this->lastPearlLaunch = -BetterPearls::getInstance()->getConfig()->get("cooldown", 300);
+        $this->endPearlCooldown = Server::getInstance()->getTick();
     }
 
     public function hasPearlCooldown(): bool {
-        return $this->lastPearlLaunch + BetterPearls::getInstance()->getConfig()->get("cooldown", 300) > Server::getInstance()->getTick();
+        return $this->endPearlCooldown > Server::getInstance()->getTick();
     }
 
     public function getPearlCooldownExpiry(): int {
-        return $this->lastPearlLaunch + BetterPearls::getInstance()->getConfig()->get("cooldown", 300) - Server::getInstance()->getTick();
+        return $this->endPearlCooldown - Server::getInstance()->getTick();
+    }
+
+    public function setPearlLand(): void {
+        $this->lastPearlLand = Server::getInstance()->getTick();
+    }
+
+    public function hasPearlLandingNow(): bool {
+        return $this->lastPearlLand === Server::getInstance()->getTick();
     }
 }
