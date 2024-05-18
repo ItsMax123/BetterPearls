@@ -39,6 +39,6 @@ class BetterPearls extends PluginBase {
     }
 
     public function getCooldown(): int {
-        return $this->getConfig()->get("cooldown", 600);
+        return $this->getConfig()->get("cooldown", 300);
     }
 }

@@ -6,5 +6,6 @@
 BetterPearls is an open source [PocketMine-MP](https://pmmp.io/) plugin aimed at improving vanilla Ender Pearls.
 
 ## Features
-- Configurable **Cooldown** for ender pearls.
+- Configurable **Cooldown** for ender pearls. (Supports the vanilla item cooldown mechanic)
+- Optional **ScoreHud** support using the `betterpearls.cooldown` tag.
 - Configurable **Anti-glitching** mechanics to prevent players from using ender pearls to go through blocks.
