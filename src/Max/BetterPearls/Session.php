@@ -12,6 +12,7 @@ class Session {
 
     public function __construct() {
         $this->stopPearlCooldown();
+        $this->setPearlLand();
     }
 
     public function startPearlCooldown(int $cooldown): void {
