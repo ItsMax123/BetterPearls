@@ -22,8 +22,11 @@ class ScoreHudTask extends Task {
 
     public function onRun(): void {
         if ($this->player->isConnected()) {
-            (new PlayerTagUpdateEvent($this->player, new ScoreTag("betterpearls.cooldown", (string)max(0, ceil($this->session->getPearlCooldownExpiry()/20)))))->call();
-            if ($this->session->hasPearlCooldown()) return;
+            (new PlayerTagUpdateEvent($this->player, new ScoreTag("betterpearls.cooldown", (string)($this->session->getPearlCooldownExpiry()/20))))->call();
+
+            // The last update will be taken care of by the PearlCooldownStopEvent listener.
+            // This makes sure that the task ends even if the cooldown is not a multiple of 20 ticks.
+            if ($this->session->getPearlCooldownExpiry() > 20) return;
         }
         $this->getHandler()->cancel();
     }

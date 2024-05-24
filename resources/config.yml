@@ -7,7 +7,7 @@ refund-canceled: true
 # Cancel launch if the player is suffocating. Recommended: true
 cancel-launch-suffocating: true
 
-# Cancel pearls that land inside blocks. Recommended: true
+# Cancel pearls that land inside blocks. (Almost never happens) Recommended: true
 cancel-landing-inside-block: true
 
 # Cancel pearls that land in areas smaller than 0.6 blocks wide. Recommemded: false

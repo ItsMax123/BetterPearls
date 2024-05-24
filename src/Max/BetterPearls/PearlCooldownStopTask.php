@@ -17,7 +17,7 @@ class PearlCooldownStopTask extends Task {
     }
 
     public function onRun(): void {
-        if ($this->player->isConnected()) {
+        if ($this->player->isConnected() && !BetterPearls::getInstance()->getSession($this->player)->hasPearlCooldown()) {
             (new PearlCooldownStopEvent($this->player))->call();
             $this->player->sendMessage(TextFormat::colorize(BetterPearls::getInstance()->getConfig()->getNested("messages.cooldown-stop", "cooldown-stop")));
         }
