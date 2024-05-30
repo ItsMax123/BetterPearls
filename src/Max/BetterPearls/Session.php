@@ -27,7 +27,7 @@ class Session {
         return $this->endPearlCooldown > Server::getInstance()->getTick();
     }
 
-    public function getPearlCooldownExpiry(): int {
+    public function getPearlCooldownTimeLeft(): int {
         return $this->endPearlCooldown - Server::getInstance()->getTick();
     }
 

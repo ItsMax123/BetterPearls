@@ -1,0 +1,13 @@
+cooldown-start: "&eYou are now in pearl cooldown for &b15&r&e seconds."
+
+cooldown-stop: "&aYou are no longer in pearl cooldown."
+
+cancel-launch-cooldown: "&cYou cannot pearl for another &b{TIME}&r&c seconds."  # Will replace {TIME}
+
+cancel-launch-suffocating: "&cYou cannot pearl while suffocating."
+
+cancel-landing-inside-block: "&cYou cannot pearl inside a block."
+
+cancel-landing-small-area: "&cYou cannot pearl in areas smaller than 0.6 blocks wide."
+
+cancel-landing-suffocating: "&cYou cannot pearl in areas smaller than 1.8 blocks tall."

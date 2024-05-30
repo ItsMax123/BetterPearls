@@ -10,23 +10,8 @@ cancel-launch-suffocating: true
 # Cancel pearls that land inside blocks. (Almost never happens) Recommended: true
 cancel-landing-inside-block: true
 
-# Cancel pearls that land in areas smaller than 0.6 blocks wide. Recommemded: false
+# Cancel pearls that land in areas smaller than 0.6 blocks wide. Recommended: false
 cancel-landing-small-area: false
 
-# Cancel pearls that land in areas where the player would be suffocating. Recommemded: false
+# Cancel pearls that land in areas where the player would be suffocating. Recommended: false
 cancel-landing-suffocating: false
-
-messages:
-  cooldown-start: "&eYou are now in pearl cooldown for &b15&r&e seconds."
-
-  cooldown-stop: "&aYou are no longer in pearl cooldown."
-
-  cancel-launch-cooldown: "&cYou cannot pearl for another &b{TIME}&r&c seconds."  # Options: {TIME} - Seconds until cooldown ends.
-
-  cancel-launch-suffocating: "&cYou cannot pearl while suffocating."
-
-  cancel-landing-inside-block: "&cYou cannot pearl inside a block."
-
-  cancel-landing-small-area: "&cYou cannot pearl in areas smaller than 0.6 blocks wide."
-
-  cancel-landing-suffocating: "&cYou cannot pearl in areas smaller than 1.8 blocks tall."

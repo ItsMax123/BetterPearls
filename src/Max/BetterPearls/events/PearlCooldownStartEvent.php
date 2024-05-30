@@ -11,6 +11,7 @@ use pocketmine\player\Player;
 
 class PearlCooldownStartEvent extends PlayerEvent implements Cancellable {
     use CancellableTrait;
+
     private int $cooldown;
 
     public function __construct(Player $player, int $cooldown) {

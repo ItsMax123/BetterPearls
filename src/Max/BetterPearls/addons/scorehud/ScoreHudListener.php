@@ -24,11 +24,8 @@ final class ScoreHudListener implements Listener {
      * @priority MONITOR
      */
     public function onPearlCooldownStart(PearlCooldownStartEvent $event): void {
-        $player = $event->getPlayer();
-        (new PlayerTagUpdateEvent($player, new ScoreTag("betterpearls.cooldown", (string)($event->getCooldown()/20))))->call();
-
-        // Using delayed repeating task instead of repeating task to avoid the 1 tick delay of repeating task first run.
-        BetterPearls::getInstance()->getScheduler()->scheduleDelayedRepeatingTask(new ScoreHudTask($player), 20, 20);
+        (new PlayerTagUpdateEvent($event->getPlayer(), new ScoreTag("betterpearls.cooldown", (string)($event->getCooldown()/20))))->call();
+        BetterPearls::getInstance()->getScheduler()->scheduleDelayedRepeatingTask(new ScoreHudTask($event->getPlayer()), ($offset = $event->getCooldown()%20) === 0 ? 20 : $offset, 20);
     }
 
     /**

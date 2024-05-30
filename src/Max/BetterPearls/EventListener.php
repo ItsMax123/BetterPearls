@@ -12,13 +12,11 @@ use pocketmine\event\entity\ProjectileHitEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\player\PlayerItemUseEvent;
-use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\item\EnderPearl as EnderPearlItem;
 use pocketmine\item\VanillaItems;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\PlayerStartItemCooldownPacket;
 use pocketmine\player\Player;
-use pocketmine\utils\TextFormat;
 use pocketmine\world\Position;
 use pocketmine\world\World;
 
@@ -35,12 +33,11 @@ final class EventListener implements Listener {
     public function onUse(PlayerItemUseEvent $event): void {
         if (!$event->getItem() instanceof EnderPearlItem) return;
         $player = $event->getPlayer();
-        $config = $this->plugin->getConfig();
-        if ($config->get("cancel-launch-suffocating", true)) {
+        if ($this->plugin->getCancelLaunchSuffocation()) {
             $position = $player->getPosition();
             if ($this->isInCollisionBox($position->getWorld(), $position->x, $position->y + $player->getEyeHeight(), $position->z)) {
                 $event->cancel();
-                $player->sendMessage(TextFormat::colorize($config->getNested("messages.cancel-launch-suffocating", "cancel-launch-suffocating")));
+                $player->sendMessage($this->plugin->getMessage("cancel-launch-suffocating"));
                 return;
             }
         }
@@ -49,8 +46,8 @@ final class EventListener implements Listener {
             $event->cancel();
             $player->sendMessage(str_replace(
                 ["{TIME}"],
-                [ceil($session->getPearlCooldownExpiry() / 20)],
-                TextFormat::colorize($config->getNested("messages.cancel-launch-cooldown", "cancel-launch-cooldown"))
+                [ceil($session->getPearlCooldownTimeLeft() / 20)],
+                $this->plugin->getMessage("cancel-launch-cooldown")
             ));
             return;
         }
@@ -60,7 +57,7 @@ final class EventListener implements Listener {
             $session->startPearlCooldown($pearlCooldownStartEvent->getCooldown());
             $this->plugin->getScheduler()->scheduleDelayedTask(new PearlCooldownStopTask($player), $pearlCooldownStartEvent->getCooldown());
             $player->getNetworkSession()->sendDataPacket(PlayerStartItemCooldownPacket::create('ender_pearl', $pearlCooldownStartEvent->getCooldown()));
-            $player->sendMessage(TextFormat::colorize($this->plugin->getConfig()->getNested("messages.cooldown-start", "cooldown-start")));
+            $player->sendMessage($this->plugin->getMessage("cooldown-start"));
         }
     }
 
@@ -98,7 +95,6 @@ final class EventListener implements Listener {
         $x = $to->getX();
         $y = $to->getY();
         $z = $to->getZ();
-        $config = $this->plugin->getConfig();
 
         // When pearling into a block that is above a fence, from below, the pearl might land inside the block.
         // If the position is inside a collision box:
@@ -140,9 +136,9 @@ final class EventListener implements Listener {
         // If the previous step failed to find a position that is not inside/touching a collision box:
         //  Stop here and possibly cancel the teleportation depending on the config.
         if ($this->isInCollisionBox($world, $x, $y, $z)) {
-            if ($config->get("cancel-landing-inside-block", true)) {
+            if ($this->plugin->getCancelLandingInsideBlock()) {
                 $event->cancel();
-                $player->sendMessage(TextFormat::colorize($config->getNested("messages.cancel-landing-inside-block", "cancel-landing-inside-block")));
+                $player->sendMessage($this->plugin->getMessage("cancel-landing-inside-block"));
             }
             return;
         }
@@ -188,9 +184,9 @@ final class EventListener implements Listener {
             } elseif ($x - $minX < 0.5) {
                 $x = $minX + 0.5;
             }
-        } elseif ($config->get("cancel-landing-small-area")) {
+        } elseif ($this->plugin->getCancelLandingSmallArea()) {
             $event->cancel();
-            $player->sendMessage(TextFormat::colorize($config->getNested("messages.cancel-landing-small-area", "cancel-landing-small-area")));
+            $player->sendMessage($this->plugin->getMessage("cancel-landing-small-area"));
             return;
         }
 
@@ -235,9 +231,9 @@ final class EventListener implements Listener {
             } elseif ($z - $minZ < 0.5) {
                 $z = $minZ + 0.5;
             }
-        } elseif ($config->get("cancel-landing-small-area")) {
+        } elseif ($this->plugin->getCancelLandingSmallArea()) {
             $event->cancel();
-            $player->sendMessage(TextFormat::colorize($config->getNested("messages.cancel-landing-small-area", "cancel-landing-small-area")));
+            $player->sendMessage($this->plugin->getMessage("cancel-landing-small-area"));
             return;
         }
 
@@ -276,9 +272,9 @@ final class EventListener implements Listener {
             if ($maxY - $y < 1.8) {
                 $y = $maxY - 1.8;
             }
-        } elseif ($config->get("cancel-landing-suffocating")) {
+        } elseif ($this->plugin->getCancelLandingSuffocating()) {
             $event->cancel();
-            $player->sendMessage(TextFormat::colorize($config->getNested("messages.cancel-landing-suffocating", "cancel-landing-suffocating")));
+            $player->sendMessage($this->plugin->getMessage("cancel-landing-suffocating"));
             return;
         }
 
@@ -293,23 +289,18 @@ final class EventListener implements Listener {
     public function onTeleportAfter(EntityTeleportEvent $event): void {
         if (!$event->isCancelled()) return;
         $player = $event->getEntity();
-        if (!$player instanceof Player) return;
-        $session = $this->plugin->getSession($player);
-        if (!$session->hasPearlLandingNow()) return;
+        if (!$player instanceof Player || !$this->plugin->getSession($player)->hasPearlLandingNow()) return;
         (new PearlCooldownStopEvent($player))->call();
-        $session->stopPearlCooldown();
-        if ($this->plugin->getConfig()->get("refund-canceled", true)) {
+        $this->plugin->getSession($player)->stopPearlCooldown();
+        if ($this->plugin->getRefundCanceled()) {
             $player->getInventory()->addItem(VanillaItems::ENDER_PEARL());
         }
     }
 
     public function onDeath(PlayerDeathEvent $event): void {
         $player = $event->getPlayer();
+        if (!$this->plugin->getSession($player)->hasPearlCooldown()) return;
         (new PearlCooldownStopEvent($player))->call();
         $this->plugin->getSession($player)->stopPearlCooldown();
-    }
-
-    public function onLeave(PlayerQuitEvent $event): void {
-        $this->plugin->removeSession($event->getPlayer());
     }
 }

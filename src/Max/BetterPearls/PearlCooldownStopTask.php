@@ -7,7 +7,6 @@ namespace Max\BetterPearls;
 use Max\BetterPearls\events\PearlCooldownStopEvent;
 use pocketmine\player\Player;
 use pocketmine\scheduler\Task;
-use pocketmine\utils\TextFormat;
 
 class PearlCooldownStopTask extends Task {
     private Player $player;
@@ -17,9 +16,9 @@ class PearlCooldownStopTask extends Task {
     }
 
     public function onRun(): void {
-        if ($this->player->isConnected() && !BetterPearls::getInstance()->getSession($this->player)->hasPearlCooldown()) {
+        if ($this->player->isConnected() && BetterPearls::getInstance()->getSession($this->player)->getPearlCooldownTimeLeft() === 0) {
             (new PearlCooldownStopEvent($this->player))->call();
-            $this->player->sendMessage(TextFormat::colorize(BetterPearls::getInstance()->getConfig()->getNested("messages.cooldown-stop", "cooldown-stop")));
+            $this->player->sendMessage(BetterPearls::getInstance()->getMessage("cooldown-stop"));
         }
     }
 }
